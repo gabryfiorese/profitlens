@@ -18,8 +18,8 @@ type NumKey = keyof ProfitInput;
 type PctKey = "platformFeePercent" | "paymentFeePercent" | "taxBufferPercent";
 
 /**
- * Renders the ProfitLens calculator, managing its inputs and displaying calculated results.
- * @returns The calculator interface as a JSX element.
+ * Root component: holds the calculator state, derives results via calculateProfit,
+ * and renders the input form plus the results panel with a price-composition bar.
  */
 export default function App() {
   const [form, setForm] = useState<ProfitInput>(defaults);
@@ -38,6 +38,10 @@ export default function App() {
 
   const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
   const money = (n: number) => (Number.isFinite(n) ? n.toFixed(2) : "—");
+
+  // La barra di composizione ha senso solo con un prezzo valido e profitto non negativo:
+  // in quel caso costi + fee + profitto = salePrice esattamente, quindi le frazioni sommano a 1.
+  const showBreakdown = result.isValid && form.salePrice > 0 && result.netProfit >= 0;
 
   return (
     <div className="page">
@@ -67,10 +71,25 @@ export default function App() {
             <p className="warn">{result.warning}</p>
           ) : (
             <>
+              {showBreakdown && (
+                <div className="breakdown">
+                  <div className="bar" role="img" aria-label="Price composition">
+                    <span className="bar-seg seg-cost" style={{ width: `${(result.totalCosts / form.salePrice) * 100}%` }} />
+                    <span className="bar-seg seg-fee" style={{ width: `${(result.estimatedFees / form.salePrice) * 100}%` }} />
+                    <span className="bar-seg seg-profit" style={{ width: `${(result.netProfit / form.salePrice) * 100}%` }} />
+                  </div>
+                  <div className="legend">
+                    <span className="legend-item"><i className="dot dot-cost" /> Costs {money(result.totalCosts)}</span>
+                    <span className="legend-item"><i className="dot dot-fee" /> Fees {money(result.estimatedFees)}</span>
+                    <span className="legend-item"><i className="dot dot-profit" /> Profit {money(result.netProfit)}</span>
+                  </div>
+                </div>
+              )}
+
               <Row k="Total costs" v={money(result.totalCosts)} />
               <Row k="Estimated fees" v={money(result.estimatedFees)} />
-              <Row k="Net profit" v={money(result.netProfit)} strong />
-              <Row k="Margin" v={pct(result.margin)} />
+              <Row k="Net profit" v={money(result.netProfit)} strong tone={result.netProfit >= 0 ? "good" : "bad"} />
+              <Row k="Margin" v={pct(result.margin)} tone={result.margin >= 0.1 ? "good" : "bad"} />
               <Row k="ROI" v={pct(result.roi)} />
               <Row k="Break-even price" v={money(result.breakEvenPrice)} />
               <Row k="Suggested price" v={result.suggestedPrice !== null ? money(result.suggestedPrice) : "—"} />
@@ -85,13 +104,7 @@ export default function App() {
   );
 }
 
-/**
- * Renders a controlled numeric input with a descriptive label.
- * @param props.label The text displayed beside the input.
- * @param props.value The current numeric value of the input.
- * @param props.onChange The handler called when the input value changes.
- * @returns A labeled numeric input as a JSX element.
- */
+/** A labelled numeric input row used inside the Inputs card. */
 function Field(props: {
   label: string;
   value: number;
@@ -105,16 +118,11 @@ function Field(props: {
   );
 }
 
-/**
- * Renders a labeled result value, optionally emphasizing the row.
- * @param props.k The result label.
- * @param props.v The result value to display.
- * @param props.strong Whether to emphasize the result row.
- * @returns A result row as a JSX element.
- */
-function Row(props: { k: string; v: string; strong?: boolean }) {
+/** A key/value result row; `strong` bolds it, `tone` colors the value green or red. */
+function Row(props: { k: string; v: string; strong?: boolean; tone?: "good" | "bad" }) {
+  const cls = "row" + (props.strong ? " strong" : "") + (props.tone ? " " + props.tone : "");
   return (
-    <div className={"row" + (props.strong ? " strong" : "")}>
+    <div className={cls}>
       <span>{props.k}</span>
       <span>{props.v}</span>
     </div>
