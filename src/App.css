@@ -1,0 +1,15 @@
+.page { max-width: 980px; margin: 0 auto; padding: 24px; font-family: system-ui, sans-serif; color: #111; }
+.hero h1 { margin: 0; font-size: 2rem; }
+.hero p { margin: 4px 0 24px; color: #555; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+.card { background: #fff; border: 1px solid #e3e3e3; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.card h2 { margin: 0 0 14px; font-size: 1.1rem; }
+.field { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+.field span { font-size: .9rem; color: #333; }
+.field input { width: 120px; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; text-align: right; }
+.reset { margin-top: 8px; padding: 8px 14px; border: 1px solid #ccc; background: #f6f6f6; border-radius: 6px; cursor: pointer; }
+.results .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #eee; }
+.results .row.strong { font-weight: 700; }
+.warn { color: #b00020; background: #ffecec; padding: 8px 10px; border-radius: 6px; }
+.foot { margin-top: 24px; text-align: center; color: #888; font-size: .85rem; }
