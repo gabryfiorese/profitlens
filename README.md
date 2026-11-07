@@ -11,7 +11,7 @@ Sellers often price from "cost vs sale" and forget platform fees, payment fees, 
 - Configurable platform / payment / tax fees (percent + fixed)
 - Loss and low-margin warnings
 - Typed calculation core covered by unit tests
-- Responsive two-column UI
+- Responsive two-column UI with visual price breakdown
 
 ## Tech stack
 React 19 · TypeScript · Vite · Vitest
